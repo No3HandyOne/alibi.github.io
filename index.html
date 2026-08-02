@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Alibi</title>
+<meta name="theme-color" content="#1b1a17" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<style>
+:root{--charcoal:#1b1a17;--paper:#ede6d6;--manila:#d8c9a3;--amber:#f2a93b;--amber-dim:#c98a2c;--red:#b23a2e;--red-dim:#7c2820;}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:Georgia,'Times New Roman',serif;background:radial-gradient(ellipse at 50% 0%,#262319 0%,#17150f 60%,#0f0d09 100%);min-height:100vh;color:var(--charcoal);}
+#app{min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;}
+.bulb-wrap{display:flex;flex-direction:column;align-items:center;height:90px;margin-bottom:4px;}
+.bulb-cord{width:2px;height:40px;background:#4a4335;}
+.bulb{width:26px;height:34px;border-radius:50% 50% 45% 45%;background:#3a3627;margin-top:-2px;transition:all .6s ease;animation:swing 5s ease-in-out infinite;transform-origin:top center;}
+.bulb-on{background:var(--amber);box-shadow:0 0 40px 14px rgba(242,169,59,.55),0 0 90px 40px rgba(242,169,59,.18);}
+@keyframes swing{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+.stage{width:100%;max-width:560px;}
+.card{background:var(--paper);border-radius:6px;padding:28px 26px 26px;box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.06);position:relative;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,var(--red) 0 18px,transparent 18px 34px);opacity:.55;border-radius:6px 6px 0 0;}
+.fade-in{animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.eyebrow{font-family:'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:var(--red-dim);font-weight:700;margin-bottom:10px;}
+.title{font-family:'Courier New',monospace;font-size:42px;letter-spacing:.08em;margin:0 0 8px;}
+.subtitle{color:#4a4437;font-size:15px;line-height:1.5;margin:0 0 22px;}
+.hint{color:#6b6252;font-size:14px;line-height:1.5;margin:6px 0 18px;}
+.question-text{font-size:22px;line-height:1.4;margin:4px 0 14px;}
+.question-recall{font-size:16px;font-style:italic;color:#55503f;margin:0 0 16px;}
+.field-group{margin-bottom:20px;}
+.label{display:block;font-family:'Courier New',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b6252;margin-bottom:8px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.text-input{width:100%;border:1.5px solid #c9bc9c;background:#faf7ee;border-radius:4px;padding:11px 12px;font-size:15px;color:var(--charcoal);resize:vertical;outline:none;font-family:Georgia,serif;}
+.text-input:focus{border-color:var(--amber-dim);}
+.answer-input{margin-bottom:16px;}
+.cat-grid{display:grid;grid-template-columns:1fr;gap:8px;}
+.cat-card{text-align:left;border:1.5px solid #c9bc9c;background:#faf7ee;border-radius:4px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;width:100%;}
+.cat-selected{border-color:var(--red-dim);background:#f6ece2;box-shadow:inset 0 0 0 1px var(--red-dim);}
+.cat-label{font-weight:700;font-size:14.5px;}
+.cat-desc{font-size:12.5px;color:#7a715d;}
+.strike-picker{display:flex;gap:8px;}
+.strike-choice{width:38px;height:38px;border-radius:50%;border:1.5px solid #c9bc9c;background:#faf7ee;font-family:'Courier New',monospace;font-weight:700;cursor:pointer;color:var(--charcoal);}
+.strike-choice-selected{background:var(--red-dim);border-color:var(--red-dim);color:#fff;}
+.btn{font-family:'Courier New',monospace;font-weight:700;letter-spacing:.03em;border-radius:4px;padding:13px 20px;font-size:14.5px;border:none;cursor:pointer;width:100%;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:var(--charcoal);color:var(--amber);}
+.btn-large{padding:16px 20px;font-size:15.5px;}
+.btn-ghost{background:transparent;border:1.5px solid var(--red-dim);color:var(--red-dim);}
+.judge-row{display:flex;gap:10px;margin-top:4px;}
+.judge-row .btn{flex:1;}
+.cover-card{text-align:center;padding-top:40px;padding-bottom:40px;}
+.eye-icon{font-size:34px;margin-bottom:10px;opacity:.7;}
+.cover-title{font-family:'Courier New',monospace;font-size:19px;margin:0 0 6px;}
+.compare-card{position:relative;}
+.answers-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;perspective:1000px;}
+.answer-flip-outer{height:150px;}
+.answer-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+.answer-flip-inner.flipped{transform:rotateY(180deg);}
+.answer-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:4px;padding:12px;display:flex;flex-direction:column;}
+.answer-back{background:var(--manila);align-items:center;justify-content:center;font-family:'Courier New',monospace;font-size:32px;color:#8a7a54;}
+.answer-front{background:#faf7ee;border:1.5px solid #c9bc9c;transform:rotateY(180deg);overflow-y:auto;}
+.answer-name{font-family:'Courier New',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--red-dim);font-weight:700;margin-bottom:6px;}
+.answer-text{font-size:14px;line-height:1.4;}
+.strikes{display:flex;gap:6px;justify-content:center;margin-top:4px;}
+.strike-dot{width:11px;height:11px;border-radius:50%;background:#d8cba9;border:1.5px solid #b8a878;}
+.strike-hit{background:var(--red-dim);border-color:var(--red-dim);}
+.stamp{font-family:'Courier New',monospace;font-size:30px;font-weight:900;letter-spacing:.08em;color:var(--red);border:5px solid var(--red);border-radius:6px;text-align:center;padding:10px 0;transform:rotate(-8deg);animation:stampIn .35s cubic-bezier(.2,1.4,.4,1);margin-bottom:4px;}
+@keyframes stampIn{0%{transform:rotate(-8deg) scale(2.4);opacity:0;}60%{opacity:1;}100%{transform:rotate(-8deg) scale(1);opacity:1;}}
+.end-card{text-align:center;}
+.end-banner{font-family:'Courier New',monospace;font-size:24px;font-weight:900;letter-spacing:.06em;padding:14px;border-radius:4px;margin-bottom:8px;}
+.end-banner-busted{background:var(--red-dim);color:#fff;}
+.end-banner-survived{background:var(--charcoal);color:var(--amber);}
+.recap{text-align:left;max-height:320px;overflow-y:auto;margin:18px 0;display:flex;flex-direction:column;gap:8px;padding-right:4px;}
+.recap-row{background:#faf7ee;border:1.5px solid #c9bc9c;border-radius:4px;padding:10px 12px;}
+.recap-row-bad{border-color:var(--red-dim);background:#f8ece9;}
+.recap-q{font-weight:700;font-size:13.5px;margin-bottom:4px;}
+.recap-a{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#6b6252;}
+@media (max-width:420px){.two-col{grid-template-columns:1fr;}.answers-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const CATEGORIES = [
+  {id:"soiree",label:"La soirée chez Léo",desc:"Une fête qui a un peu dérapé.",questions:[
+    "Quelle était la première boisson servie en arrivant ?",
+    "Qui a mis la musique en premier ?",
+    "À quelle heure êtes-vous arrivés, à peu près ?",
+    "Qu'est-ce qui traînait sur la table du salon ?",
+    "Qui a renversé quelque chose pendant la soirée ?",
+    "Quel sujet de conversation a fait le plus rire tout le monde ?",
+    "Qui est parti en premier, et pourquoi ?",
+    "Décris la tenue de l'hôte ce soir-là.",
+    "À quel jeu ou activité avez-vous joué ensemble ?",
+    "Qu'avez-vous mangé en dernier avant de partir ?"]},
+  {id:"roadtrip",label:"Le road trip improvisé",desc:"Un trajet qui ne s'est pas passé comme prévu.",questions:[
+    "Quelle était la destination de départ prévue ?",
+    "Qui conduisait au moment où vous vous êtes perdus ?",
+    "Quelle chanson tournait en boucle dans la voiture ?",
+    "Où avez-vous fait votre première pause ?",
+    "Qu'avez-vous acheté à la station-service ?",
+    "Qui a proposé le détour bizarre ?",
+    "Quel a été le pire moment du trajet ?",
+    "Combien de fois vous êtes-vous arrêtés en tout ?",
+    "Que s'est-il passé quand la voiture est tombée en panne (ou a failli) ?",
+    "Où avez-vous dormi la première nuit ?"]},
+  {id:"resto",label:"Le resto d'hier soir",desc:"Un dîner à reconstituer plat par plat.",questions:[
+    "Qu'avez-vous commandé chacun ?",
+    "Qui a choisi le restaurant ?",
+    "Combien de temps avez-vous attendu une table ?",
+    "Qu'est-ce qui a été offert par la maison, si quelque chose l'a été ?",
+    "Qui a payé l'addition, et comment ?",
+    "De quoi avez-vous parlé pendant l'entrée ?",
+    "Qu'est-ce qui a été renvoyé en cuisine, si ça a été le cas ?",
+    "Quelle était l'ambiance ou la musique du lieu ?",
+    "Qui est arrivé en retard ?",
+    "Qu'avez-vous fait juste après être sortis ?"]},
+  {id:"mariage",label:"Le mariage du cousin",desc:"Une cérémonie pleine de détails à ne pas oublier.",questions:[
+    "Où étiez-vous assis pendant le repas ?",
+    "Qui a fait le discours le plus long ?",
+    "Quelle a été la première chanson dansée ?",
+    "Qu'avez-vous offert comme cadeau ?",
+    "Qui a pleuré pendant la cérémonie ?",
+    "Qu'est-ce qui a changé dans la tenue de la mariée en soirée, si elle en a changé ?",
+    "À quelle heure avez-vous quitté la fête ?",
+    "Qui a attrapé le bouquet ?",
+    "Quel incident a marqué la soirée ?",
+    "Avec qui avez-vous le plus dansé ?"]},
+  {id:"entretien",label:"L'entretien qui a mal tourné",desc:"Un rendez-vous professionnel à raconter sans se trahir.",questions:[
+    "À quelle heure était le rendez-vous ?",
+    "Qui vous a accueillis en arrivant ?",
+    "Quelle a été la question la plus gênante posée ?",
+    "Qu'aviez-vous préparé pour répondre à « pourquoi ce poste » ?",
+    "Combien de personnes étaient présentes dans la salle ?",
+    "Qu'est-ce qui a foiré pendant l'entretien (café renversé, téléphone, etc.) ?",
+    "Quelle tenue portiez-vous ?",
+    "Combien de temps a duré l'entretien ?",
+    "Qu'avez-vous répondu à la question sur vos défauts ?",
+    "Qu'avez-vous fait juste après être sortis ?"]},
+];
+const STAMP = "GRILLÉS";
+
+let state = {
+  screen:"setup", names:{p1:"",p2:""}, maxStrikes:3, categoryId:CATEGORIES[0].id, freestyle:false,
+  customQuestion:"", pool:[], qIndex:0, currentQuestion:"", writer:1, draft:"",
+  answers:{a1:"",a2:""}, strikes:0, history:[], stampShown:false, flip:false,
+};
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+const app = document.getElementById('app');
+
+function render(){
+  const bulbOn = !(state.screen==="compare" && !state.flip);
+  app.innerHTML = `
+    <div class="bulb-wrap">
+      <div class="bulb-cord"></div>
+      <div class="bulb ${bulbOn?'bulb-on':''}"></div>
+    </div>
+    <div class="stage" id="stage"></div>
+  `;
+  const stage = document.getElementById('stage');
+  stage.innerHTML = screenHTML();
+  bindEvents();
+}
+
+function p1name(){return state.names.p1.trim()||"Suspect 1";}
+function p2name(){return state.names.p2.trim()||"Suspect 2";}
+
+function screenHTML(){
+  switch(state.screen){
+    case "setup": return setupHTML();
+    case "question": return questionHTML();
+    case "question-custom": return questionCustomHTML();
+    case "cover-write": return coverHTML("Écran caché aux autres", `${esc(p1name())} récupère l'écran, seul·e.`, `${esc(p1name())} est prêt·e`, "ready-write");
+    case "writing": return writingHTML(state.writer===1?p1name():p2name());
+    case "cover-write2": return coverHTML("Réponse enregistrée", `Cache l'écran et passe-le à ${esc(p2name())}.`, "C'est fait, continuer", "proceed-cover1");
+    case "cover-write2b": return coverHTML("Écran caché aux autres", `${esc(p2name())} récupère l'écran, seul·e.`, `${esc(p2name())} est prêt·e`, "ready-write2");
+    case "cover-compare": return coverHTML("Les deux réponses sont enregistrées", "Rends l'écran au lecteur pour le verdict.", "Révéler les réponses", "reveal-compare");
+    case "compare": return compareHTML();
+    case "end-busted": return endHTML(true);
+    case "end-survived": return endHTML(false);
+    default: return "";
+  }
+}
+
+function setupHTML(){
+  const canStart = state.names.p1.trim() && state.names.p2.trim();
+  const cats = CATEGORIES.map(c=>`
+    <button class="cat-card ${!state.freestyle && state.categoryId===c.id?'cat-selected':''}" data-cat="${c.id}">
+      <span class="cat-label">${esc(c.label)}</span>
+      <span class="cat-desc">${esc(c.desc)}</span>
+    </button>`).join('');
+  const strikes = [1,2,3,4,5].map(n=>`<button class="strike-choice ${state.maxStrikes===n?'strike-choice-selected':''}" data-strike="${n}">${n}</button>`).join('');
+  return `
+  <div class="card fade-in">
+    <div class="eyebrow">Dossier n°1</div>
+    <h1 class="title">ALIBI</h1>
+    <p class="subtitle">Un·e lecteur mène l'interrogatoire. Deux suspects répondent en secret, chacun leur tour. S'ils se contredisent trop, ils sont grillés.</p>
+    <div class="field-group">
+      <label class="label">Les deux suspects</label>
+      <div class="two-col">
+        <input class="text-input" id="p1input" placeholder="Prénom suspect 1" value="${esc(state.names.p1)}" />
+        <input class="text-input" id="p2input" placeholder="Prénom suspect 2" value="${esc(state.names.p2)}" />
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="label">Le scénario</label>
+      <div class="cat-grid">
+        ${cats}
+        <button class="cat-card ${state.freestyle?'cat-selected':''}" data-cat="freestyle">
+          <span class="cat-label">Improvisation</span>
+          <span class="cat-desc">Le lecteur invente ses questions en direct.</span>
+        </button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="label">Nombre de faux pas tolérés</label>
+      <div class="strike-picker">${strikes}</div>
+    </div>
+    <button class="btn btn-primary btn-large" id="startBtn" ${canStart?'':'disabled'}>Ouvrir le dossier</button>
+  </div>`;
+}
+
+function questionHTML(){
+  const total = state.freestyle ? '' : ` / ${state.pool.length}`;
+  const num = state.freestyle ? state.history.length+1 : state.qIndex+1;
+  return `
+  <div class="card fade-in">
+    <div class="eyebrow">Question ${num}${total}</div>
+    <p class="question-text">${esc(state.currentQuestion)}</p>
+    <p class="hint">Le lecteur lit la question à voix haute, puis passe l'écran au premier suspect.</p>
+    <button class="btn btn-primary" id="beginWrite1">${esc(p1name())}, à toi d'écrire →</button>
+  </div>`;
+}
+
+function questionCustomHTML(){
+  return `
+  <div class="card fade-in">
+    <div class="eyebrow">Question ${state.history.length+1} · improvisée</div>
+    <p class="hint">Le lecteur invente sa propre question et la tape ici (les suspects ne regardent pas).</p>
+    <textarea class="text-input" id="customQ" rows="3" placeholder="Tape ta question…">${esc(state.customQuestion)}</textarea>
+    <button class="btn btn-primary" id="confirmCustom" ${state.customQuestion.trim()?'':'disabled'}>Valider la question →</button>
+  </div>`;
+}
+
+function coverHTML(title, subtitle, action, actionId){
+  return `
+  <div class="card fade-in cover-card">
+    <div class="eye-icon">👁</div>
+    <h2 class="cover-title">${esc(title)}</h2>
+    <p class="hint">${subtitle}</p>
+    <button class="btn btn-primary" id="${actionId}">${esc(action)}</button>
+  </div>`;
+}
+
+function writingHTML(name){
+  return `
+  <div class="card fade-in">
+    <div class="eyebrow">Réponse confidentielle · ${esc(name)}</div>
+    <p class="question-recall">« ${esc(state.currentQuestion)} »</p>
+    <textarea class="text-input answer-input" id="draftInput" rows="4" placeholder="Écris ta réponse ici…">${esc(state.draft)}</textarea>
+    <button class="btn btn-primary" id="submitDraft" ${state.draft.trim()?'':'disabled'}>Valider ma réponse</button>
+  </div>`;
+}
+
+function answerCardHTML(name, text, flipped, delay){
+  return `
+  <div class="answer-flip-outer" style="transition-delay:${delay}ms">
+    <div class="answer-flip-inner ${flipped?'flipped':''}">
+      <div class="answer-face answer-back">?</div>
+      <div class="answer-face answer-front">
+        <span class="answer-name">${esc(name)}</span>
+        <span class="answer-text">${esc(text)||"(sans réponse)"}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function compareHTML(){
+  const dots = Array.from({length:state.maxStrikes}).map((_,i)=>`<span class="strike-dot ${i<state.strikes?'strike-hit':''}"></span>`).join('');
+  const judgeOrStamp = state.stampShown
+    ? `<div class="stamp">${STAMP}</div>`
+    : `<div class="judge-row">
+         <button class="btn btn-ghost" id="judgeNo" style="border-color:var(--red-dim);color:var(--red-dim)">Grillés</button>
+         <button class="btn btn-primary" id="judgeYes">Alibi solide</button>
+       </div>`;
+  return `
+  <div class="card fade-in compare-card">
+    <div class="eyebrow">Verdict du lecteur</div>
+    <p class="question-recall">« ${esc(state.currentQuestion)} »</p>
+    <div class="answers-row">
+      ${answerCardHTML(p1name(), state.answers.a1, state.flip, 0)}
+      ${answerCardHTML(p2name(), state.answers.a2, state.flip, 120)}
+    </div>
+    ${judgeOrStamp}
+    <div class="strikes">${dots}</div>
+  </div>`;
+}
+
+function endHTML(busted){
+  const rows = state.history.map(h=>`
+    <div class="recap-row ${h.matched?'':'recap-row-bad'}">
+      <div class="recap-q">${esc(h.question)}</div>
+      <div class="recap-a">
+        <span>${esc(p1name())} : ${esc(h.a1)||'—'}</span>
+        <span>${esc(p2name())} : ${esc(h.a2)||'—'}</span>
+      </div>
+    </div>`).join('');
+  return `
+  <div class="card fade-in end-card">
+    <div class="end-banner ${busted?'end-banner-busted':'end-banner-survived'}">${busted?'ALIBI EFFONDRÉ':'ALIBI TENU'}</div>
+    <p class="hint">${busted?`${esc(p1name())} et ${esc(p2name())} se sont trop souvent contredits.`:`${esc(p1name())} et ${esc(p2name())} ont tenu leur histoire jusqu'au bout.`}</p>
+    <div class="recap">${rows}</div>
+    <button class="btn btn-primary" id="restartBtn">Nouveau dossier</button>
+  </div>`;
+}
+
+function bindEvents(){
+  const $ = (id)=>document.getElementById(id);
+
+  if(state.screen==="setup"){
+    $('p1input').oninput = e=>{state.names.p1=e.target.value; refreshStartBtn();};
+    $('p2input').oninput = e=>{state.names.p2=e.target.value; refreshStartBtn();};
+    document.querySelectorAll('[data-cat]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const cat = btn.getAttribute('data-cat');
+        if(cat==='freestyle'){state.freestyle=true;} else {state.freestyle=false; state.categoryId=cat;}
+        render();
+      };
+    });
+    document.querySelectorAll('[data-strike]').forEach(btn=>{
+      btn.onclick = ()=>{state.maxStrikes=parseInt(btn.getAttribute('data-strike'),10); render();};
+    });
+    $('startBtn').onclick = startGame;
+  }
+
+  if(state.screen==="question"){
+    $('beginWrite1').onclick = ()=>{state.writer=1; state.draft=""; state.screen="cover-write"; render();};
+  }
+
+  if(state.screen==="question-custom"){
+    $('customQ').oninput = e=>{state.customQuestion=e.target.value; $('confirmCustom').disabled=!state.customQuestion.trim();};
+    $('confirmCustom').onclick = ()=>{
+      if(!state.customQuestion.trim())return;
+      state.currentQuestion = state.customQuestion.trim();
+      state.screen="question"; render();
+    };
+  }
+
+  if(state.screen==="cover-write"){
+    $('ready-write').onclick = ()=>{state.screen="writing"; render();};
+  }
+  if(state.screen==="cover-write2"){
+    $('proceed-cover1').onclick = ()=>{state.writer=2; state.draft=""; state.screen="cover-write2b"; render();};
+  }
+  if(state.screen==="cover-write2b"){
+    $('ready-write2').onclick = ()=>{state.screen="writing"; render();};
+  }
+  if(state.screen==="cover-compare"){
+    $('reveal-compare').onclick = ()=>{
+      state.flip=false; state.screen="compare"; render();
+      setTimeout(()=>{state.flip=true; render();}, 60);
+    };
+  }
+
+  if(state.screen==="writing"){
+    $('draftInput').oninput = e=>{state.draft=e.target.value; $('submitDraft').disabled=!state.draft.trim();};
+    $('submitDraft').onclick = ()=>{
+      if(state.writer===1){
+        state.answers.a1 = state.draft;
+        state.screen="cover-write2";
+      } else {
+        state.answers.a2 = state.draft;
+        state.screen="cover-compare";
+      }
+      render();
+    };
+  }
+
+  if(state.screen==="compare" && !state.stampShown){
+    const yes = $('judgeYes'), no = $('judgeNo');
+    if(yes) yes.onclick = ()=>judge(true);
+    if(no) no.onclick = ()=>judge(false);
+  }
+
+  if(state.screen==="end-busted" || state.screen==="end-survived"){
+    $('restartBtn').onclick = ()=>{
+      state = {...state, screen:"setup", strikes:0, history:[], answers:{a1:"",a2:""}, qIndex:0};
+      render();
+    };
+  }
+}
+
+function refreshStartBtn(){
+  const btn = document.getElementById('startBtn');
+  if(btn) btn.disabled = !(state.names.p1.trim() && state.names.p2.trim());
+}
+
+function startGame(){
+  const cat = CATEGORIES.find(c=>c.id===state.categoryId);
+  state.pool = state.freestyle ? [] : shuffle(cat.questions);
+  state.qIndex = 0;
+  state.strikes = 0;
+  state.history = [];
+  goToNextQuestion(true);
+}
+
+function goToNextQuestion(first){
+  if(!state.freestyle){
+    if(state.qIndex >= state.pool.length){
+      state.screen="end-survived"; render(); return;
+    }
+    state.currentQuestion = state.pool[state.qIndex];
+    state.screen="question";
+  } else {
+    state.customQuestion="";
+    state.screen="question-custom";
+  }
+  render();
+}
+
+function judge(matched){
+  state.history.push({question:state.currentQuestion, a1:state.answers.a1, a2:state.answers.a2, matched});
+  if(!matched){
+    state.stampShown = true;
+    state.strikes += 1;
+    render();
+    setTimeout(()=>{
+      state.stampShown = false;
+      if(state.strikes >= state.maxStrikes){
+        state.screen="end-busted"; render();
+      } else {
+        advance();
+      }
+    }, 1200);
+  } else {
+    advance();
+  }
+}
+
+function advance(){
+  state.answers = {a1:"", a2:""};
+  state.qIndex += 1;
+  goToNextQuestion(false);
+}
+
+render();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

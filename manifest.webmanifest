@@ -1,0 +1,14 @@
+{
+  "name": "Alibi - Jeu d'interrogatoire",
+  "short_name": "Alibi",
+  "description": "Deux suspects, un lecteur, une seule histoire à ne pas se tromper.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1a17",
+  "theme_color": "#1b1a17",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
